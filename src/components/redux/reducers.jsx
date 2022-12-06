@@ -1,6 +1,5 @@
 const initialState = {
   users: [],
-  loginedUser: [],
   avatars: [],
   books: [],
   borrowandreturn: [],
@@ -9,6 +8,11 @@ const initialState = {
 const rootReducer = (state = initialState, action) => {
   switch (action.type) {
     case "FECTH_USER_SUCCESS":
+      return {
+        ...state,
+        users: [...action.payload],
+      };
+    case "FECTH_USERS_SUCCESS":
       return {
         ...state,
         users: [...action.payload],

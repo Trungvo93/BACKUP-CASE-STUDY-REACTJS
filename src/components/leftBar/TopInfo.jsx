@@ -11,7 +11,6 @@ const TopInfo = () => {
     const infoLoginUser = users.find(
       (item) => item.username === cookies.username
     );
-    // console.log(loginedUser.hasOwnProperty("username"));
     setLoginedUser({ ...infoLoginUser });
   }, [users]);
   const navigate = useNavigate();

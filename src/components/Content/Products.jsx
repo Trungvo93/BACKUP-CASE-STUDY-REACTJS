@@ -3,7 +3,7 @@ import "./Products.css";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { getAction } from "../redux/actions";
+import { getAction, getBooks } from "../redux/actions";
 import { useNavigate } from "react-router-dom";
 import Toast from "react-bootstrap/Toast";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -33,7 +33,10 @@ const Products = () => {
     }
     setPageNumbers([...pages]);
   };
-
+  useEffect(() => {
+    dispatch(getBooks());
+    console.log("checkbook");
+  }, []);
   useEffect(() => {
     getPageNumbers(listBooks);
   }, []);

@@ -6,10 +6,13 @@ import TopInfo from "./leftBar/TopInfo";
 import { Outlet } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAction } from "./redux/actions";
+import {
+  getUsers,
+  getAvatars,
+  getBooks,
+  getBorrowAndReturn,
+} from "./redux/actions";
 import { NavLink } from "react-router-dom";
-
-import axios from "axios";
 const Layout = () => {
   const [cookies, setCookie] = useCookies();
   const users = useSelector((state) => state.users);
@@ -35,58 +38,20 @@ const Layout = () => {
     setCookie("role", undefined, {
       path: "/",
     });
-    dispatch(getAction("FECTH_LOGIN_SUCCESS", []));
     navigate("/");
   };
   const handleBackLogin = () => {
     navigate("/");
   };
   useEffect(() => {
-    axios
-      .get("https://637edb84cfdbfd9a63b87c1c.mockapi.io/users")
-      .then((res) => {
-        dispatch(getAction("FECTH_USER_SUCCESS", res.data));
-      })
-      .catch((err) => console.log(err));
-
-    axios
-      .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/avatars`)
-      .then((res) => {
-        dispatch(getAction("FECTH_AVATAR_SUCCESS", res.data));
-      })
-      .catch((err) => console.log(err));
-    axios
-      .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/books`)
-      .then((res) => {
-        dispatch(getAction("FECTH_BOOKS_SUCCESS", res.data));
-      })
-      .catch((err) => console.log(err));
-    axios
-      .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/borrowandreturn`)
-      .then((res) => {
-        const newList = [...res.data];
-        res.data.map((item, index) => {
-          const currentDate = new Date();
-          if (
-            Date.parse(currentDate.toString()) > Date.parse(item.dayReturn) &&
-            item.dayReturned === ""
-          ) {
-            newList[index].status = "Expires";
-            axios
-              .put(
-                `https://637edb84cfdbfd9a63b87c1c.mockapi.io/borrowandreturn/${item.id}`,
-                { ...item, status: "Expires" }
-              )
-              .catch((err1) => {
-                console.log("Error check expires: ", err1);
-              });
-          }
-        });
-        dispatch(getAction("FECTH_BORROWANDRETURN_SUCCESS", newList));
-      })
-      .catch((err) => console.log(err));
+    dispatch(getUsers());
+    // dispatch(getAvatars());
+    // dispatch(getBooks());
+    // dispatch(getBorrowAndReturn());
+    // console.log("reload");
   }, []);
 
+  //Check afk for 3m
   useEffect(() => {
     const newCookie = {
       username: cookies.username,
@@ -108,9 +73,9 @@ const Layout = () => {
     const infoLoginUser = users.find(
       (item) => item.username === cookies.username
     );
-    // console.log(loginedUser.hasOwnProperty("username"));
     setLoginedUser({ ...infoLoginUser });
   }, [store]);
+
   if (loginedUser.hasOwnProperty("username")) {
     return (
       <div className="container-fluid m-0">

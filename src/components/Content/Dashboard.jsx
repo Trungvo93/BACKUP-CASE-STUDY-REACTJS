@@ -1,14 +1,21 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
 import { useCookies } from "react-cookie";
+import { getUsers, getBooks, getBorrowAndReturn } from "../redux/actions";
 const Dashboard = () => {
   const [cookies] = useCookies();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const booksList = useSelector((state) => state.books);
   const usersList = useSelector((state) => state.users);
   const borrowandreturnList = useSelector((state) => state.borrowandreturn);
+  useEffect(() => {
+    dispatch(getBooks());
+    dispatch(getBorrowAndReturn());
+  }, []);
   const returnedList = borrowandreturnList.filter(
     (e) => e.dayReturned !== ""
   ).length;

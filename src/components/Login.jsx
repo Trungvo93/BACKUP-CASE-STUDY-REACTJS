@@ -11,22 +11,17 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import "./Login.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAction } from "./redux/actions";
+import { getAction, getUsers } from "./redux/actions";
 const theme = createTheme();
 const Login = () => {
   const [cookies, setCookie] = useCookies();
-  const [users, setUsers] = useState([]);
+  const users = useSelector((state) => state.users);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
-    axios
-      .get("https://637edb84cfdbfd9a63b87c1c.mockapi.io/users")
-      .then((res) => {
-        setUsers([...res.data]);
-      })
-      .catch((err) => console.log(err));
+    dispatch(getUsers());
   }, []);
 
   const handleSubmit = (event) => {

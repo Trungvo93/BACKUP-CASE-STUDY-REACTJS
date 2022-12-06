@@ -3,7 +3,7 @@ import "./Users.css";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { getAction } from "../redux/actions";
+import { getAction, deleteUser } from "../redux/actions";
 import { useNavigate } from "react-router-dom";
 import Toast from "react-bootstrap/Toast";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -34,8 +34,11 @@ const Users = () => {
     setPageNumbers([...pages]);
   };
   useEffect(() => {
-    getPageNumbers(listUsers);
-  }, []);
+    setListUsers([...users]);
+    getPageNumbers(users);
+    setIdActive(1);
+    setUsersPerPage(users.slice(0, 10));
+  }, [users]);
 
   const [usersPerPage, setUsersPerPage] = useState([...listUsers.slice(0, 10)]);
 
@@ -81,30 +84,13 @@ const Users = () => {
     if (itemDelete.username === cookies.username) {
       setShowSameID(true);
     } else if (e.target.value === "confirm") {
-      axios
-        .delete(
-          `https://637edb84cfdbfd9a63b87c1c.mockapi.io/users/${itemDelete.id}`
-        )
-        .then((res) => {
-          const newList = users.filter((e) => e.id !== res.data.id);
-          dispatch(getAction("FECTH_USER_SUCCESS", newList));
-          setListUsers([...newList]);
-          getPageNumbers(newList);
-          setIdActive(1);
-          setUsersPerPage(newList.slice(0, 10));
-        })
-        .then((res2) => {
-          setShow(true);
-          setFindItem("");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      dispatch(deleteUser(itemDelete.id));
+      setShow(true);
+      setFindItem("");
     }
   };
 
   //Trigger Toast popup
-
   return (
     <div>
       {/* Show popup same ID */}
