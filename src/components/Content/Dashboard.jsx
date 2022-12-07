@@ -13,6 +13,7 @@ const Dashboard = () => {
   const usersList = useSelector((state) => state.users);
   const borrowandreturnList = useSelector((state) => state.borrowandreturn);
   useEffect(() => {
+    dispatch(getUsers());
     dispatch(getBooks());
     dispatch(getBorrowAndReturn());
   }, []);
