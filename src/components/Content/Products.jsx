@@ -2,8 +2,7 @@ import React, { useEffect } from "react";
 import "./Products.css";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
-import { getAction, getBooks, deleteBook } from "../redux/actions";
+import { getBooks, deleteBook } from "../redux/actions";
 import { useNavigate } from "react-router-dom";
 import Toast from "react-bootstrap/Toast";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -193,7 +192,7 @@ const Products = () => {
           </thead>
           <tbody>
             {booksPerPage.map((e, index) => (
-              <tr key={index}>
+              <tr key={index} className="align-middle">
                 <td>{index + 1}</td>
                 <td className="text-capitalize">{e.title}</td>
                 <td className="text-capitalize">{e.ISBN}</td>
@@ -205,19 +204,23 @@ const Products = () => {
                 <td className="text-capitalize">{e.update_on}</td>
                 <td>
                   {cookies.role === "admin" ? (
-                    <div className="d-flex flex-column flex-xl-row gap-2 gap-xl-0 h-100 ">
-                      <button
-                        className="btn btn-warning me-3"
-                        onClick={() => handleEditUser(e)}>
-                        Edit
-                      </button>{" "}
-                      <button
-                        className="btn btn-danger "
-                        onClick={() => {
-                          handleClickOpen(e);
-                        }}>
-                        Delete
-                      </button>
+                    <div className="row">
+                      <div className="col-12 mb-2">
+                        <button
+                          className="btn btn-warning w-100"
+                          onClick={() => handleEditUser(e)}>
+                          Edit
+                        </button>
+                      </div>
+                      <div className="col-12 mb-2">
+                        <button
+                          className="btn btn-danger w-100"
+                          onClick={() => {
+                            handleClickOpen(e);
+                          }}>
+                          Delete
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     ""

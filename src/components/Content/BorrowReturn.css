@@ -1,3 +1,18 @@
 .input-filter {
   width: 400px;
 }
+
+.expires {
+  font-weight: bold;
+
+  color: red;
+  border: 1px red dotted;
+  padding: 2px;
+}
+
+.done {
+  font-weight: bold;
+  color: green;
+  border: 2px green dotted;
+  padding: 2px;
+}

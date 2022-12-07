@@ -516,7 +516,14 @@ const BorrowReturn = () => {
                   <td>{e.title}</td>
                   <td>{e.dayBorrow.slice(4, 24)}</td>
                   <td>{e.dayReturn}</td>
-                  <td>{e.status}</td>
+                  <td>
+                    <span
+                      className={`${e.status === "Expires" ? "expires" : ""} ${
+                        e.status === "Done" ? "done" : ""
+                      }`}>
+                      {e.status}
+                    </span>
+                  </td>
                   <td>{e.amount}</td>
                   <td>{e.note}</td>
                   <td>
