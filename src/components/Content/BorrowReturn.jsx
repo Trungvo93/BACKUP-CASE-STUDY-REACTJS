@@ -160,7 +160,7 @@ const BorrowReturn = () => {
       );
 
       //Update amount to list book
-      // dispatch(getBooks());
+
       const index = books.findIndex((item) => item.id === borrowItem.bookID);
       const newAmount =
         parseInt(borrowItem.amount) + parseInt(books[index].amount);
@@ -198,11 +198,22 @@ const BorrowReturn = () => {
         setShowSubmit(true);
 
         //Update amount to list book
-        const newAmount = Number(bookInfo.amount - borrowInfo.amount);
-        setBookInfo({ ...bookInfo, amount: newAmount });
-        dispatch(
-          updateBook(borrowInfo.bookID, { ...bookInfo, amount: newAmount })
-        );
+        axios
+          .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/`)
+          .then((res) => {
+            const index = res.data.findIndex((item) => item.id === bookInfo.id);
+            const newAmount =
+              parseInt(res.data[index].amount) - parseInt(borrowInfo.amount);
+
+            const newBook = { ...res.data[index], amount: newAmount };
+            dispatch(updateBook(borrowInfo.bookID, newBook));
+          });
+
+        // const newAmount = Number(bookInfo.amount - borrowInfo.amount);
+        // setBookInfo({ ...bookInfo, amount: newAmount });
+        // dispatch(
+        //   updateBook(borrowInfo.bookID, { ...bookInfo, amount: newAmount })
+        // );
         setBookInfo({
           bookID: "",
           ISBN: "",
