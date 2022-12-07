@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { getAction } from "../redux/actions";
+import { getAction, updateBook } from "../redux/actions";
 import { useSelector, useDispatch } from "react-redux";
 import "./ProductDetail.css";
 import axios from "axios";
@@ -62,21 +62,8 @@ const ProductDetail = () => {
     setConfirm(false);
     getDate();
     if (e.target.value === "agree") {
-      axios
-        .put(
-          `https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/${state.id}`,
-          form
-        )
-        .then((res1) => {
-          axios
-            .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/books`)
-            .then((res2) => {
-              dispatch(getAction("FECTH_BOOKS_SUCCESS", res2.data));
-              setShow(true);
-            })
-            .catch((err3) => console.log(err3));
-        })
-        .catch((err1) => console.log(err1));
+      dispatch(updateBook(state.id, form));
+      setShow(true);
     }
   };
 

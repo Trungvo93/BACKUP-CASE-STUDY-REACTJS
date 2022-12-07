@@ -45,6 +45,8 @@ const Layout = () => {
   };
   useEffect(() => {
     dispatch(getUsers());
+    // dispatch(getBooks());
+
     // dispatch(getAvatars());
     // dispatch(getBooks());
     // dispatch(getBorrowAndReturn());

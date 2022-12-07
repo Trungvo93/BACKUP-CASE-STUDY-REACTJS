@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getAction } from "../redux/actions";
+import { getAction, addBook } from "../redux/actions";
 import { useSelector, useDispatch } from "react-redux";
 import "./AddProduct.css";
 import axios from "axios";
@@ -72,22 +72,10 @@ const AddProduct = () => {
             (e) => Number(e.ISBN) === Number(form.ISBN)
           );
           if (found === -1) {
+            dispatch(addBook(form));
             setShow(true);
             setTimeout(() => {
-              axios
-                .post(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/books`, form)
-                .then((res1) => {
-                  axios
-                    .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/books`)
-                    .then((res2) => {
-                      dispatch(getAction("FECTH_BOOKS_SUCCESS", res2.data));
-                    })
-                    .then((res3) => {
-                      navigate("/home/products");
-                    })
-                    .catch((err3) => console.log(err3));
-                })
-                .catch((err1) => console.log(err1));
+              navigate("/home/products");
             }, 1000);
           } else {
             setShowError(true);

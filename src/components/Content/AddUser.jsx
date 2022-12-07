@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { getAction } from "../redux/actions";
+import React, { useEffect, useState } from "react";
+import { getAction, addUser, getAvatars } from "../redux/actions";
 import { useSelector, useDispatch } from "react-redux";
 import "./AddUser.css";
 import axios from "axios";
@@ -24,6 +24,9 @@ const AddUser = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const date = new Date();
+  useEffect(() => {
+    dispatch(getAvatars());
+  }, []);
   const [form, setForm] = useState({
     name: "",
     avatar:
@@ -128,27 +131,10 @@ const AddUser = () => {
                 (e) => e.username === form.username
               );
               if (found === -1) {
+                dispatch(addUser(form));
+                setShow(true);
                 setTimeout(() => {
-                  axios
-                    .post(
-                      `https://637edb84cfdbfd9a63b87c1c.mockapi.io/users`,
-                      form
-                    )
-                    .then((res1) => {
-                      setShow(true);
-                      axios
-                        .get(
-                          `https://637edb84cfdbfd9a63b87c1c.mockapi.io/users`
-                        )
-                        .then((res2) => {
-                          dispatch(getAction("FECTH_USER_SUCCESS", res2.data));
-                        })
-                        .then((res3) => {
-                          navigate("/home/users");
-                        })
-                        .catch((err3) => console.log(err3));
-                    })
-                    .catch((err1) => console.log(err1));
+                  navigate("/home/users");
                 }, 1000);
               } else {
                 setShowError(true);

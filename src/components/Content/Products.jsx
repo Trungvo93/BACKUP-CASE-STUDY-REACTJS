@@ -3,7 +3,7 @@ import "./Products.css";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
-import { getAction, getBooks } from "../redux/actions";
+import { getAction, getBooks, deleteBook } from "../redux/actions";
 import { useNavigate } from "react-router-dom";
 import Toast from "react-bootstrap/Toast";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -14,7 +14,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useCookies } from "react-cookie";
 
 const Products = () => {
-  const [cookies, setCookie] = useCookies();
+  const [cookies] = useCookies();
   const [confirm, setConfirm] = useState(false);
   const [show, setShow] = useState(false);
   const navigate = useNavigate();
@@ -26,6 +26,8 @@ const Products = () => {
   const [typeFilter, setTypeFilter] = useState("title");
   const [pageNumbers, setPageNumbers] = useState([]);
   const [itemDelete, setItemDelete] = useState({});
+  const [booksPerPage, setBooksPerPage] = useState([...books.slice(0, 10)]);
+
   const getPageNumbers = (list) => {
     const pages = [];
     for (let i = 1; i <= Math.ceil(list.length / 10); i++) {
@@ -35,20 +37,20 @@ const Products = () => {
   };
   useEffect(() => {
     dispatch(getBooks());
-    console.log("checkbook");
   }, []);
   useEffect(() => {
-    getPageNumbers(listBooks);
-  }, []);
-
-  const [usersPerPage, setUsersPerPage] = useState([...listBooks.slice(0, 10)]);
+    setListBooks([...books]);
+    getPageNumbers(books);
+    setIdActive(1);
+    setBooksPerPage(books.slice(0, 10));
+  }, [books]);
 
   //Jump pageNumbers
   const handleJumpPage = (index) => {
     const firstIndex = index * 10 - 10;
     const lastIndex = index * 10;
     const newList = listBooks.slice(firstIndex, lastIndex);
-    setUsersPerPage(newList);
+    setBooksPerPage(newList);
     setIdActive(index);
   };
 
@@ -63,7 +65,7 @@ const Products = () => {
     getPageNumbers(listFilter);
     setIdActive(1);
     const newList = listFilter.slice(0, 10);
-    setUsersPerPage(newList);
+    setBooksPerPage(newList);
   };
 
   //Add product
@@ -84,25 +86,9 @@ const Products = () => {
   const handleDelete = (e) => {
     setConfirm(false);
     if (e.target.value === "confirm") {
-      axios
-        .delete(
-          `https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/${itemDelete.id}`
-        )
-        .then((res) => {
-          const newList = books.filter((e) => e.id !== res.data.id);
-          dispatch(getAction("FECTH_BOOKS_SUCCESS", newList));
-          setListBooks([...newList]);
-          getPageNumbers(newList);
-          setIdActive(1);
-          setUsersPerPage(newList.slice(0, 10));
-        })
-        .then((res2) => {
-          setShow(true);
-          setFindItem("");
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      dispatch(deleteBook(itemDelete.id));
+      setShow(true);
+      setFindItem("");
     }
   };
 
@@ -206,7 +192,7 @@ const Products = () => {
             </tr>
           </thead>
           <tbody>
-            {usersPerPage.map((e, index) => (
+            {booksPerPage.map((e, index) => (
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td className="text-capitalize">{e.title}</td>

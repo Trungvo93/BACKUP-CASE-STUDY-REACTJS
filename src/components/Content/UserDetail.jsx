@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { getAction } from "../redux/actions";
+import { getAction, updateUser } from "../redux/actions";
 import { useSelector, useDispatch } from "react-redux";
 import "./AddUser.css";
 import axios from "axios";
@@ -111,21 +111,8 @@ const UserDetail = () => {
             form.studentCode !== "" &&
             form.schoolCode !== "")
         ) {
-          axios
-            .put(
-              `https://637edb84cfdbfd9a63b87c1c.mockapi.io/users/${state.id}`,
-              form
-            )
-            .then((res1) => {
-              axios
-                .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/users`)
-                .then((res2) => {
-                  dispatch(getAction("FECTH_USER_SUCCESS", res2.data));
-                  setShow(true);
-                })
-                .catch((err3) => console.log(err3));
-            })
-            .catch((err1) => console.log(err1));
+          dispatch(updateUser(state.id, form));
+          setShow(true);
         } else {
           setCheckCode(true);
         }

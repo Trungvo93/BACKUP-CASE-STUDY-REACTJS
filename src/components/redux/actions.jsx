@@ -100,3 +100,98 @@ export const deleteUser = (id) => {
     }
   };
 };
+
+export const deleteBook = (id) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.delete(
+        `https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/${id}`
+      );
+      dispatch(getBooks());
+    } catch (err) {
+      console.log("Error delete book: ", err);
+    }
+  };
+};
+export const addUser = (payload) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.post(
+        `https://637edb84cfdbfd9a63b87c1c.mockapi.io/users/`,
+        payload
+      );
+      dispatch(getUsers());
+    } catch (err) {
+      console.log("Error add user: ", err);
+    }
+  };
+};
+
+export const addBook = (payload) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.post(
+        `https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/`,
+        payload
+      );
+      dispatch(getBooks());
+    } catch (err) {
+      console.log("Error add book: ", err);
+    }
+  };
+};
+export const addBorrowAndReturn = (payload) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.post(
+        `https://637edb84cfdbfd9a63b87c1c.mockapi.io/borrowandreturn/`,
+        payload
+      );
+      dispatch(getBorrowAndReturn());
+    } catch (err) {
+      console.log("Error add borrow and return book: ", err);
+    }
+  };
+};
+
+export const updateUser = (id, item) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.put(
+        `https://637edb84cfdbfd9a63b87c1c.mockapi.io/users/${id}`,
+        item
+      );
+      dispatch(getUsers());
+    } catch (err) {
+      console.log("Error update user: ", err);
+    }
+  };
+};
+
+export const updateBook = (id, item) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.put(
+        `https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/${id}`,
+        item
+      );
+      dispatch(getBooks());
+    } catch (err) {
+      console.log("Error update book: ", err);
+    }
+  };
+};
+
+export const updateBorrowAndReturn = (id, item) => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.put(
+        `https://637edb84cfdbfd9a63b87c1c.mockapi.io/borrowandreturn/${id}`,
+        item
+      );
+      dispatch(getBorrowAndReturn());
+    } catch (err) {
+      console.log("Error update borrow and return book: ", err);
+    }
+  };
+};

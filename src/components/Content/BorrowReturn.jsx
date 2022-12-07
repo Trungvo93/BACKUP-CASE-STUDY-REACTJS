@@ -3,7 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { getAction } from "../redux/actions";
+import {
+  getAction,
+  getBorrowAndReturn,
+  getBooks,
+  addBorrowAndReturn,
+  updateBook,
+  updateBorrowAndReturn,
+} from "../redux/actions";
 import axios from "axios";
 import * as yup from "yup";
 import "./BorrowReturn.css";
@@ -41,17 +48,27 @@ const BorrowReturn = () => {
     setPageNumbers([...pages]);
   };
   useEffect(() => {
-    getPageNumbers(borrowList);
+    dispatch(getBorrowAndReturn());
+    dispatch(getBooks());
   }, []);
+  useEffect(() => {
+    setBorrowList([...borrowandreturnList]);
+    setListBooks([...books]);
+    getPageNumbers(borrowandreturnList);
+    setIdActive(1);
+    setBorrowPerPage(borrowandreturnList.slice(0, 10));
+  }, [borrowandreturnList, books, users]);
 
-  const [bookPerPage, setBookPerPage] = useState([...borrowList.slice(0, 10)]);
+  const [borrowPerPage, setBorrowPerPage] = useState([
+    ...borrowList.slice(0, 10),
+  ]);
 
   //Jump pageNumbers
   const handleJumpPage = (index) => {
     const firstIndex = index * 10 - 10;
     const lastIndex = index * 10;
     const newList = borrowList.slice(firstIndex, lastIndex);
-    setBookPerPage(newList);
+    setBorrowPerPage(newList);
     setIdActive(index);
   };
 
@@ -62,11 +79,10 @@ const BorrowReturn = () => {
     const listFilter = borrowList.filter((item) =>
       item[typeFilter].toString().trim().toLowerCase().includes(convertValue)
     );
-    // setListBooks([...listFilter]);
     getPageNumbers(listFilter);
     setIdActive(1);
     const newList = listFilter.slice(0, 10);
-    setBookPerPage(newList);
+    setBorrowPerPage(newList);
   };
   const [bookInfo, setBookInfo] = useState({});
   const [userInfo, setUserInfo] = useState({
@@ -134,72 +150,37 @@ const BorrowReturn = () => {
     if (e.target.value === "agree") {
       const dateReturned = new Date();
       //Update list of borrows when return
-      axios
-        .put(
-          `https://637edb84cfdbfd9a63b87c1c.mockapi.io/borrowandreturn/${borrowItem.id}`,
-          {
-            ...borrowItem,
-            dayReturned: dateReturned.toString(),
-            amount: 0,
-            status: "Done",
-          }
-        )
-        .then((res) => {
-          axios
-            .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/borrowandreturn`)
-            .then((res2) => {
-              dispatch(getAction("FECTH_BORROWANDRETURN_SUCCESS", res2.data));
-              setBorrowList([...res2.data]);
-              const firstIndex = idActive * 10 - 10;
-              const lastIndex = idActive * 10;
-              const newList = res2.data.slice(firstIndex, lastIndex);
-              setBookPerPage(newList);
-            })
-            .catch((err2) => console.log(err2));
+      dispatch(
+        updateBorrowAndReturn(borrowItem.id, {
+          ...borrowItem,
+          dayReturned: dateReturned.toString(),
+          amount: 0,
+          status: "Done",
         })
-        .catch((err) => console.log("Error post item: ", err));
-      //Update amount to list book
-      axios
-        .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/`)
-        .then((res) => {
-          const index = res.data.findIndex(
-            (item) => item.id === borrowItem.bookID
-          );
-          const newAmount =
-            parseInt(borrowItem.amount) + parseInt(res.data[index].amount);
+      );
 
-          const newBook = { ...res.data[index], amount: newAmount };
-          axios
-            .put(
-              `https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/${borrowItem.bookID}`,
-              newBook
-            )
-            .then((res2) => {
-              axios
-                .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/books`)
-                .then((res3) => {
-                  dispatch(getAction("FECTH_BOOKS_SUCCESS", res3.data));
-                  setListBooks([...res3.data]);
-                  setBookInfo({
-                    bookID: "",
-                    ISBN: "",
-                    amount: "",
-                    author: "",
-                    category: "",
-                    publisher: "",
-                    title: "",
-                    update_on: "",
-                    note: "",
-                    status: "",
-                  });
-                  setBorrowInfo({ ...borrowInfo, amount: "", dayReturn: "" });
-                  setShowReturn(true);
-                })
-                .catch((err3) => console.log(err3));
-            })
-            .catch((err2) => console.log(err2));
-        })
-        .catch((err) => console.log(err));
+      //Update amount to list book
+      // dispatch(getBooks());
+      const index = books.findIndex((item) => item.id === borrowItem.bookID);
+      const newAmount =
+        parseInt(borrowItem.amount) + parseInt(books[index].amount);
+      dispatch(
+        updateBook(borrowItem.bookID, { ...books[index], amount: newAmount })
+      );
+      setBookInfo({
+        bookID: "",
+        ISBN: "",
+        amount: "",
+        author: "",
+        category: "",
+        publisher: "",
+        title: "",
+        update_on: "",
+        note: "",
+        status: "",
+      });
+      setBorrowInfo({ ...borrowInfo, amount: "", dayReturn: "" });
+      setShowReturn(true);
     }
   };
 
@@ -207,51 +188,34 @@ const BorrowReturn = () => {
     setConfirm(false);
     if (e.target.value === "agree") {
       if (bookInfo.ISBN !== "" && userInfo.studentCode !== "") {
-        setShowSubmit(true);
         //Post item to List borrow and update state store
-        axios
-          .post(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/borrowandreturn`, {
+        dispatch(
+          addBorrowAndReturn({
             ...borrowInfo,
             dayBorrow: date.toString(),
           })
-          .then((res) => {
-            axios
-              .get(
-                `https://637edb84cfdbfd9a63b87c1c.mockapi.io/borrowandreturn`
-              )
-              .then((res2) => {
-                dispatch(getAction("FECTH_BORROWANDRETURN_SUCCESS", res2.data));
-                setBorrowList([...res2.data]);
-                getPageNumbers(res2.data);
-
-                const firstIndex = idActive * 10 - 10;
-                const lastIndex = idActive * 10;
-                const newList = res2.data.slice(firstIndex, lastIndex);
-                setBookPerPage(newList);
-              })
-              .catch((err2) => console.log(err2));
-          })
-          .catch((err) => console.log("Error post item: ", err));
+        );
+        setShowSubmit(true);
 
         //Update amount to list book
         const newAmount = Number(bookInfo.amount - borrowInfo.amount);
         setBookInfo({ ...bookInfo, amount: newAmount });
-        axios
-          .put(
-            `https://637edb84cfdbfd9a63b87c1c.mockapi.io/books/${borrowInfo.bookID}`,
-            { ...bookInfo, amount: newAmount }
-          )
-          .then((res) => {
-            axios
-              .get(`https://637edb84cfdbfd9a63b87c1c.mockapi.io/books`)
-              .then((res2) => {
-                dispatch(getAction("FECTH_BOOKS_SUCCESS", res2.data));
-                setListBooks([...res2.data]);
-                setBookInfo({ ...bookInfo, amount: newAmount });
-              })
-              .catch((err2) => console.log(err2));
-          })
-          .catch((err) => console.log("Error put item book: ", err));
+        dispatch(
+          updateBook(borrowInfo.bookID, { ...bookInfo, amount: newAmount })
+        );
+        setBookInfo({
+          bookID: "",
+          ISBN: "",
+          amount: "",
+          author: "",
+          category: "",
+          publisher: "",
+          title: "",
+          update_on: "",
+          note: "",
+          status: "",
+        });
+        setBorrowInfo({ ...borrowInfo, amount: "", dayReturn: "" });
       }
     }
   };
@@ -546,7 +510,7 @@ const BorrowReturn = () => {
               </tr>
             </thead>
             <tbody>
-              {bookPerPage.map((e) => (
+              {borrowPerPage.map((e) => (
                 <tr key={e.id} className="align-middle">
                   <td>{e.name}</td>
                   <td>{e.title}</td>
